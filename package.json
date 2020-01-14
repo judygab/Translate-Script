@@ -1,0 +1,28 @@
+{
+  "name": "translate-script",
+  "version": "1.0.0",
+  "description": "JavaScript Functional Google Translate API to translate JSON values.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qunabu/translate-script.git"
+  },
+  "keywords": [
+    "functional",
+    "google",
+    "translate"
+  ],
+  "author": "Mateusz Wojczal",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/qunabu/translate-script/issues"
+  },
+  "homepage": "https://github.com/qunabu/translate-script#readme",
+  "dependencies": {
+    "fs": "0.0.1-security",
+    "node-fetch": "^2.6.0"
+  }
+}
