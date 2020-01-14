@@ -130,7 +130,7 @@ const convertToObject = arr =>
 
 getJSON(INPUT_FILE) // get data from input file
   .then(input_vars => convertToArray(input_vars)) // convert data from object to array
-  .then(input_arr => proc(input_arr, 'de', process.env.GKEY)) // process the whole array
+  .then(input_arr => proc(input_arr, TARGET_LANG, process.env.GKEY)) // process the whole array
   .then(transl_arr => convertToObject(transl_arr)) // convert data from array to object
   .then(
     output_vars => writeToFile(`translated_${TARGET_LANG}.json`, output_vars) // saves translated object into file
