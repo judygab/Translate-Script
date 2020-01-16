@@ -35,7 +35,7 @@ const getJSON = filename => {
 /**
  * Calls the translation.googleapis
  * @param {Object} term, term to be translated the shape of `{key:"", value:""}`, eg. `{key:"fullName", value:"Full name"}
- * @param {String} target language code eg `en` 
+ * @param {String} target language code eg `en`
  * @param {String} key Google Api Key generated with `gcloud auth application-default print-access-token`
  * @returns {Promise} resolve object is in the same shape as input
  */
@@ -56,6 +56,11 @@ const getTranslation = (term, target, key) => {
           target: target
         })
       })
+        .then(response =>
+          response.ok
+            ? response
+            : reject(`Fetch failed with status code ${response.status}`)
+        )
         .then(response => response.json()) // parses response to JSON
         .then(json =>
           json.error
@@ -89,17 +94,14 @@ const writeToFile = (filename, obj) => {
  * @param {Array} arr, array of objects term to be translated in the shape of `{key:"", value:""}`, eg. `{key:"fullName", value:"Full name"}
  * @returns {Promise} resolved array is in the same shape as input
  */
-const proc = (arr, target = "de", api_key = process.env.GKEY) => {
-  return new Promise((resolve, reject) => {
-    const convert = (arr, book = [], currentIndex = 0) => {
-      if (currentIndex <= arr.length - 1) { // if currentIndex is not at the end of array  lets process the next row 
-        getTranslation(arr[currentIndex], target, api_key)
-          .then(obj => convert(arr, [...book, obj], currentIndex + 1)) // process next row 
-          .catch(err => reject(err)); // return error is anything goes wrong 
-      } else { // otherwise we have processed all row and it's time to return the final results 
-        resolve(book);
-      }
-    };
+const processTranslation = (arr, target = "de", api_key = process.env.GKEY) => {
+  return new Promise((resolve) => {
+    const convert = (arr, book = [], currentIndex = 0) =>
+      currentIndex <= arr.length - 1
+        ? getTranslation(arr[currentIndex], target, api_key).then(obj =>
+            convert(arr, [...book, obj], currentIndex + 1)
+          )
+        : resolve(book);
     convert(arr);
   });
 };
@@ -130,10 +132,8 @@ const convertToObject = arr =>
 
 getJSON(INPUT_FILE) // get data from input file
   .then(input_vars => convertToArray(input_vars)) // convert data from object to array
-  .then(input_arr => proc(input_arr, TARGET_LANG, process.env.GKEY)) // process the whole array
+  .then(input_arr =>processTranslation(input_arr, TARGET_LANG, process.env.GKEY)) // process the whole array
   .then(transl_arr => convertToObject(transl_arr)) // convert data from array to object
-  .then(
-    output_vars => writeToFile(`translated_${TARGET_LANG}.json`, output_vars) // saves translated object into file
-  )
+  .then(output_vars => writeToFile(`translated_${TARGET_LANG}.json`, output_vars) // saves translated object into file)
   .then(filename => console.log(`translation succesfully saved in ${filename}`)) // outputs success
   .catch(err => console.error("Error", err)); // shows error in case of any of above fails
