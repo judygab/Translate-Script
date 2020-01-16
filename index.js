@@ -71,8 +71,8 @@ const getTranslation = (term, target, key) => {
               })
         )
         .catch(error => reject(error));
-    });
-  }, 50);
+    }, 50);
+  });
 };
 
 /**
