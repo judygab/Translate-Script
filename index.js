@@ -43,6 +43,7 @@ const getTranslation = (term, target, key) => {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       // lets avoid throttle issue with googleapis request
+      // Google API limit number of concurrent calls, we'll call the API each 50 miliseconds
       fetch("https://translation.googleapis.com/language/translate/v2", {
         method: "POST",
         headers: {
@@ -62,15 +63,18 @@ const getTranslation = (term, target, key) => {
             : reject(`Fetch failed with status code ${response.status}`)
         )
         .then(response => response.json()) // parses response to JSON
-        .then(json =>
+        .then((
+          json // check if the result is valid,
+        ) =>
           json.error
-            ? reject(json.error)
+            ? reject(json.error) // reject if response contains error
             : resolve({
+                // resole the translation
                 key: term.key,
                 value: json.data.translations[0].translatedText
               })
         )
-        .catch(error => reject(error));
+        .catch(error => reject(error)); // reject in case of any error
     }, 50);
   });
 };
@@ -95,12 +99,12 @@ const writeToFile = (filename, obj) => {
  * @returns {Promise} resolved array is in the same shape as input
  */
 const processTranslation = (arr, target = "de", api_key = process.env.GKEY) => {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     /**
-     * 
-     * @param {Array} arr input variables array. Terms to be translated  
-     * @param {Array} book output variable array. Translated terms. 
-     * @param {Integer} currentIndex of proccesing queue 
+     *
+     * @param {Array} arr input variables array. Terms to be translated
+     * @param {Array} book output variable array. Translated terms.
+     * @param {Integer} currentIndex of proccesing queue
      */
     const convert = (arr, book = [], currentIndex = 0) =>
       currentIndex <= arr.length - 1
@@ -138,8 +142,12 @@ const convertToObject = arr =>
 
 getJSON(INPUT_FILE) // get data from input file
   .then(input_vars => convertToArray(input_vars)) // convert data from object to array
-  .then(input_arr =>processTranslation(input_arr, TARGET_LANG, process.env.GKEY)) // process the whole array
+  .then(input_arr =>
+    processTranslation(input_arr, TARGET_LANG, process.env.GKEY)
+  ) // process the whole array
   .then(transl_arr => convertToObject(transl_arr)) // convert data from array to object
-  .then(output_vars => writeToFile(`translated_${TARGET_LANG}.json`, output_vars)) // saves translated object into file)
+  .then(output_vars =>
+    writeToFile(`translated_${TARGET_LANG}.json`, output_vars)
+  ) // saves translated object into file)
   .then(filename => console.log(`translation succesfully saved in ${filename}`)) // outputs success
   .catch(err => console.error("Error", err)); // shows error in case of any of above fails
