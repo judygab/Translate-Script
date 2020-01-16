@@ -100,7 +100,7 @@ const processTranslation = (arr, target = "de", api_key = process.env.GKEY) => {
      * 
      * @param {Array} arr input variables array. Terms to be translated  
      * @param {Array} book output variable array. Translated terms. 
-     * @param {Integer} currentIndex of proccesing queue
+     * @param {Integer} currentIndex of proccesing queue 
      */
     const convert = (arr, book = [], currentIndex = 0) =>
       currentIndex <= arr.length - 1
@@ -140,6 +140,6 @@ getJSON(INPUT_FILE) // get data from input file
   .then(input_vars => convertToArray(input_vars)) // convert data from object to array
   .then(input_arr =>processTranslation(input_arr, TARGET_LANG, process.env.GKEY)) // process the whole array
   .then(transl_arr => convertToObject(transl_arr)) // convert data from array to object
-  .then(output_vars => writeToFile(`translated_${TARGET_LANG}.json`, output_vars) // saves translated object into file)
+  .then(output_vars => writeToFile(`translated_${TARGET_LANG}.json`, output_vars)) // saves translated object into file)
   .then(filename => console.log(`translation succesfully saved in ${filename}`)) // outputs success
   .catch(err => console.error("Error", err)); // shows error in case of any of above fails
