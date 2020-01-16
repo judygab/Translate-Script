@@ -96,6 +96,12 @@ const writeToFile = (filename, obj) => {
  */
 const processTranslation = (arr, target = "de", api_key = process.env.GKEY) => {
   return new Promise((resolve) => {
+    /**
+     * 
+     * @param {Array} arr input variables array. Terms to be translated  
+     * @param {Array} book output variable array. Translated terms. 
+     * @param {Integer} currentIndex of proccesing queue
+     */
     const convert = (arr, book = [], currentIndex = 0) =>
       currentIndex <= arr.length - 1
         ? getTranslation(arr[currentIndex], target, api_key).then(obj =>
